@@ -42,17 +42,18 @@ public class Productor extends HttpServlet {
                 msisdn = Utils.politicaMovil(msisdn, operador); 
             }
             
-            
+            String body = "msisdn="+msisdn+"&operador="+operador+"&carrier="+carrier+"&idInterno="+idInterno;
+            String retorno ="";
             ProducerImpl prod = new ProducerImpl();
             try {
-                prod.enviar(carrier,msisdn,operador,idInterno,logger);
+            	retorno = prod.enviar(carrier,msisdn,operador,idInterno,body,logger);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
            
             long timerBillFin = (new Date()).getTime();
-            out.println("OK");
+            out.println(retorno);
             out.close();
             logger.info("[ipAcceso:"+ipAcceso+"] [Msisdn:"+msisdn+"][carrier:"+carrier+"] [idInterno:"+idInterno+"]  [TiempoTx:"+ (timerBillFin - timerBillIni) + "]");
         }

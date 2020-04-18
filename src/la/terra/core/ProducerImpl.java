@@ -102,8 +102,9 @@ public class ProducerImpl{
                 }
         }
 
-        public void enviar(String carrier, String msisdn, String operador,String idInterno, LogLocal logger) throws Exception{
-                Connection connection = null;
+        public String enviar(String carrier, String msisdn, String operador,String idInterno, String body,LogLocal logger) throws Exception{
+                String retorno = "NOK_ERROR_ENCOLAMIENTO";
+        		Connection connection = null;
                 try {
 
                         connection = this.ConectionMasterMQ( this.user,  
@@ -114,17 +115,21 @@ public class ProducerImpl{
                         connection.start();
                         this.toQueue(SesionMasterMQ( connection , 
                                         this.subject),
-                                        ProductorMasterMQ( connection), carrier, msisdn,operador, idInterno);            
+                                        ProductorMasterMQ( connection), carrier, msisdn,operador, idInterno,body);            
+                        retorno = "OK_ENCOLAMIENTO_CORRECTO";
                 } catch (Exception e) {
                         e.printStackTrace();
-                        throw new Exception();
+                        return retorno;
+                        //throw new Exception();
                 } finally {
                         try {
                                 connection.close();
                         } catch (Throwable e) {
-                                e.printStackTrace();
+                        	return retorno;
+                        	//e.printStackTrace();
                         }
                 }
+                return retorno;
         }
         
       
@@ -195,10 +200,10 @@ public class ProducerImpl{
 
         }
         
-        protected void toQueue(Session session, MessageProducer producer , String carrier, String msisdn,String operador,String idInterno) throws Exception {
+        protected void toQueue(Session session, MessageProducer producer , String carrier, String msisdn,String operador,String idInterno,String body) throws Exception {
 
                 TextMessage message=null;
-                message = session.createTextMessage();
+                message = session.createTextMessage(body);
         
                 try{
                         message.setStringProperty("carrier", carrier);
